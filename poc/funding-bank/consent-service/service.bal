@@ -7,9 +7,9 @@ import ballerina/uuid;
 # bound to port `9090`.
 service /open\-banking/v1\.0/aisp on new http:Listener(9090) {
 
-    # A resource for getting account information.
+    # A resource for getting account consent.
     # 
-    # + consentResource - The consent resource.
+    # + consentResource - the consent resource.
     # + return - account information.
     resource function post account\-access\-consents(@http:Payload json consentResource) returns json|error {
         io:println("Constructing Account Consent Response");

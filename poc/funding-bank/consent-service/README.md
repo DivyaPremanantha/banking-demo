@@ -1,1 +1,0 @@
-Funding bank's consent service

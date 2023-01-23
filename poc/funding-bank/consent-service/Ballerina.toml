@@ -1,6 +1,6 @@
 [package]
 org = "divya"
-name = "funding_bank_consent_service"
+name = "consent_service"
 version = "0.1.0"
 distribution = "2201.2.3"
 
