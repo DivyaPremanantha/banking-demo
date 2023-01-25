@@ -1,5 +1,5 @@
 import ballerina/http;
-import cgnzntpoc/funding_banks_consent_service;
+import cgnzntpoc/fundingbankconsentservice;
 
 # A service representing a network-accessible API
 # bound to port `9090`.
