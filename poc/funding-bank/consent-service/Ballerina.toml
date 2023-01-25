@@ -1,11 +1,8 @@
 [package]
-org = "choreo"
+org = "divya"
 name = "consent_service"
-version = "1.2.1"
-export = ["consent_service"]
+version = "0.1.0"
 distribution = "2201.2.3"
-keywords = ["Kind/Sample","Type/RestApi","Category/Service","Internal/http"]
-icon = "docs/icon.png"
 
 [build-options]
 observabilityIncluded = true
