@@ -1,6 +1,6 @@
 [package]
-org = "cgnzntpoc"
-name = "funding_banks_consent_service"
+org = "divya"
+name = "banking_api"
 version = "0.1.0"
 distribution = "2201.2.3"
 
