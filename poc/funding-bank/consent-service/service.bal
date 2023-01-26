@@ -34,7 +34,7 @@ service / on new http:Listener(9090) {
         where consent.ConsentId == accountConsentId
         select consent;
 
-        return accountConsent.toJsonString();
+        return accountConsent[0].toJsonString();
     }
 
     # A resource for getting account consent.
@@ -43,9 +43,9 @@ service / on new http:Listener(9090) {
     # + return - account information.
     resource function get accountConsents(string consentID) returns json|error {
         AccountConsent[] accountConsent = from var consent in accountConsents
-        where consent.ConsentId == accountConsentId
+        where consent.ConsentId == consentID
         select consent;
 
-        return accountConsent.toJsonString();
+        return accountConsent[0].toJsonString();
     }
 }
