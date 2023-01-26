@@ -7,10 +7,9 @@ import ballerina/uuid;
 # bound to port `9090`.
  
  string accountConsentId = uuid:createType1AsString();
- string accounConsenttUpdateDateTime = "";
 
 table<AccountConsent> accountConsents = table [
-    {ConsentId:  accountConsentId, Status: "AwaitingAuthorisation", StatusUpdateDateTime: accounConsenttUpdateDateTime, CreationDateTime: accounConsenttUpdateDateTime}
+
 ];
 
 type AccountConsent record {
@@ -18,6 +17,13 @@ type AccountConsent record {
     string Status;
     string StatusUpdateDateTime;
     string CreationDateTime;
+    string TransactionFromDateTime;
+    string TransactionToDateTime;
+    string ExpirationDateTime;
+    string[] Permissions;
+    object{} Meta;
+    object{} Risk;
+    object{} Links;
 };
 service / on new http:Listener(9090) {
 
@@ -27,14 +33,16 @@ service / on new http:Listener(9090) {
     # + return - account information.
     resource function post accountConsents(@http:Payload json consentResource) returns json|error {
         io:println("Constructing Account Consent Response");
-        accounConsenttUpdateDateTime = time:utcToString(time:utcNow());
+
+        AccountConsent accConsent = {ConsentId: accountConsentId, Status: check consentResource.Data.Status.ensureType(), StatusUpdateDateTime: time:utcToString(time:utcNow()), CreationDateTime: time:utcToString(time:utcNow()), 
+       TransactionFromDateTime: check consentResource.Data.Status.TransactionFromDateTime, TransactionToDateTime: check consentResource.Data.Status.TransactionToDateTime, ExpirationDateTime: check consentResource.Data.Status.ExpirationDateTime, 
+       Permissions: check consentResource.Data.Status.Permissions.ensureType(), Meta: check consentResource.Data.Status.Meta.ensureType(), Risk: check consentResource.Data.Status.Risk.ensureType(), Links: object {}};
+
+        accountConsents.add(accConsent);
+
         io:println("Account Consent Response Constructed");
-
-        AccountConsent[] accountConsent = from var consent in accountConsents
-        where consent.ConsentId == accountConsentId
-        select consent;
-
-        return accountConsent[0].toJsonString();
+        
+        return accConsent.toString().toJson();
     }
 
     # A resource for getting account consent.
@@ -46,6 +54,7 @@ service / on new http:Listener(9090) {
         where consent.ConsentId == consentID
         select consent;
 
-        return accountConsent[0].toJsonString();
+        io:println("Account Consent Response Retrieved");
+        return accountConsent[0].toString().toJson();
     }
 }
