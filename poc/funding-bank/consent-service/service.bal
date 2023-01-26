@@ -5,6 +5,20 @@ import ballerina/uuid;
 
 # A service representing a network-accessible API
 # bound to port `9090`.
+ 
+ string accountConsentId = uuid:createType1AsString();
+ string accounConsenttUpdateDateTime = "";
+
+table<AccountConsent> accountConsents = table [
+    {ConsentId:  accountConsentId, Status: "AwaitingAuthorisation", StatusUpdateDateTime: accounConsenttUpdateDateTime, CreationDateTime: accounConsenttUpdateDateTime}
+];
+
+type AccountConsent record {
+    readonly string ConsentId;
+    string Status;
+    string StatusUpdateDateTime;
+    string CreationDateTime;
+};
 service / on new http:Listener(9090) {
 
     # A resource for generating account consent.
@@ -13,10 +27,14 @@ service / on new http:Listener(9090) {
     # + return - account information.
     resource function post accountConsents(@http:Payload json consentResource) returns json|error {
         io:println("Constructing Account Consent Response");
-        json mapJson = {"Data": {"ConsentId": uuid:createType1AsString(), "Status": "AwaitingAuthorisation", "StatusUpdateDateTime": time:utcToString(time:utcNow()), "CreationDateTime": time:utcToString(time:utcNow())}};
-        json|error consentResponse = consentResource.mergeJson(mapJson);
+        accounConsenttUpdateDateTime = time:utcToString(time:utcNow());
         io:println("Account Consent Response Constructed");
-        return consentResponse;
+
+        AccountConsent[] accountConsent = from var consent in accountConsents
+        where consent.ConsentId == accountConsentId
+        select consent;
+
+        return accountConsent.toJsonString();
     }
 
     # A resource for getting account consent.
@@ -24,8 +42,10 @@ service / on new http:Listener(9090) {
     # + consentID - the consent ID.
     # + return - account information.
     resource function get accountConsents(string consentID) returns json|error {
-        json|error consentResponse = "{}";
-        io:println("Account Consent Response Constructed");
-        return consentResponse;
+        AccountConsent[] accountConsent = from var consent in accountConsents
+        where consent.ConsentId == accountConsentId
+        select consent;
+
+        return accountConsent.toJsonString();
     }
 }

@@ -8,7 +8,7 @@ configurable string consentServiceClientSecret = ?;
 
 service /aopen\-banking/v1\.0/aisp on new http:Listener(9090) {
 
-    # A resource for generating greetings
+    # A resource for generating account consent.
     # + consentResource - the consent resource.
     # + return - account information.
     resource function post account\-access\-consents(@http:Payload json consentResource) returns json|error {
@@ -21,4 +21,16 @@ service /aopen\-banking/v1\.0/aisp on new http:Listener(9090) {
         return check consentService ->/accountConsents.post(consentResource);
     }
 
+    # A resource to return account consent.
+    # + consentId - the consent resource.
+    # + return - account information.
+    resource function get account\-access\-consents(string consentId) returns json|error {
+        fundingbankconsentmanagement:Client consentService = check new (config = {
+            auth: {
+                clientId: consentServiceClientId,
+                clientSecret: consentServiceClientSecret
+            }
+        });
+        return check consentService ->/accountConsents(consentId);
+    }
 }
