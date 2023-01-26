@@ -34,7 +34,7 @@ service / on new http:Listener(9090) {
     resource function post accountConsents(@http:Payload json consentResource) returns json|error {
         io:println("Constructing Account Consent Response");
 
-        AccountConsent accConsent = {ConsentId: accountConsentId, Status: check consentResource.Data.Status.ensureType(), StatusUpdateDateTime: time:utcToString(time:utcNow()), CreationDateTime: time:utcToString(time:utcNow()), 
+        AccountConsent accConsent = {ConsentId: accountConsentId, Status: "AwaitingAuthorisation", StatusUpdateDateTime: time:utcToString(time:utcNow()), CreationDateTime: time:utcToString(time:utcNow()), 
        TransactionFromDateTime: check consentResource.Data.Status.TransactionFromDateTime, TransactionToDateTime: check consentResource.Data.Status.TransactionToDateTime, ExpirationDateTime: check consentResource.Data.Status.ExpirationDateTime, 
        Permissions: check consentResource.Data.Status.Permissions.ensureType(), Meta: check consentResource.Data.Status.Meta.ensureType(), Risk: check consentResource.Data.Status.Risk.ensureType(), Links: object {}};
 
