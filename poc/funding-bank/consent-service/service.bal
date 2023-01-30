@@ -16,7 +16,7 @@ type PaymentConsent record {
     string Status;
     string StatusUpdateDateTime;
     string CreationDateTime;
-    string Permissions;
+    string Permission;
     InitiationRecord Initiation;
 };
 
@@ -138,7 +138,7 @@ service / on new http:Listener(9090) {
 
 function generatePaymentConsent(json consentResource) returns PaymentConsent|error {
     return  {ConsentId: uuid:createType1AsString(), Status: "AwaitingAuthorisation", StatusUpdateDateTime: time:utcToString(time:utcNow()), CreationDateTime: time:utcToString(time:utcNow()), 
-        Permissions: check consentResource.Data.Permissions.ensureType(), Initiation: {Reference: check consentResource.Data.Initiation.Reference.ensureType(), 
+        Permission: check consentResource.Data.Permissions.ensureType(), Initiation: {Reference: check consentResource.Data.Initiation.Reference.ensureType(), 
         FirstPaymentDateTime: check consentResource.Data.Initiation.FirstPaymentDateTime.ensureType(), FinalPaymentDateTime: check consentResource.Data.Initiation.FinalPaymentDateTime.ensureType(), 
         DebtorAccount: {Identification: check consentResource.Data.Initiation.DebtorAccount.Identification.ensureType(), Name: check consentResource.Data.Initiation.DebtorAccount.Name.ensureType()}, 
         CreditorAccount: {Identification: check consentResource.Data.Initiation.CreditorAccount.Identification.ensureType(), Name: check consentResource.Data.Initiation.CreditorAccount.Name.ensureType()}, 
