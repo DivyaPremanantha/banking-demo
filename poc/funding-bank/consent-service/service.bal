@@ -79,6 +79,7 @@ service / on new http:Listener(9090) {
             io:println("Account Consent Response Constructed");
             return accountConsent.toString().toJson();
         } else {
+            io:println("Error in constructing the Account Consent Response");
             return accountConsent;
         }
     }
@@ -114,6 +115,7 @@ service / on new http:Listener(9090) {
             paymentConsents.add(paymentConsent);
             return paymentConsent.toString().toJson();
         } else {
+            io:println("Error in constructing the Payment Consent Response");
             return paymentConsent;
         }
     }

@@ -11,6 +11,10 @@ service /aopen\-banking/v1\.0/aisp on new http:Listener(9090) {
     # Resource for generating payment consent.
     # + consentResource - the consent resource.
     # + return - account information.
+    @http:ResourceConfig {
+        consumes: ["application/json"],
+        produces: ["application/json"]
+    }
     resource function post payment\-access\-consents(@http:Payload json consentResource) returns json|error {
         fundingbankconsentmanagement:Client consentService = check new (config = {
             auth: {
