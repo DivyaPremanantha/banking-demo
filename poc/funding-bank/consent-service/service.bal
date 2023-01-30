@@ -21,9 +21,6 @@ type AccountConsent record {
     string TransactionToDateTime;
     string ExpirationDateTime;
     json[] Permissions;
-    object{} Meta;
-    object{} Risk;
-    object{} Links;
 };
 service / on new http:Listener(9090) {
 
@@ -36,7 +33,7 @@ service / on new http:Listener(9090) {
 
         AccountConsent accConsent = {ConsentId: accountConsentId, Status: "AwaitingAuthorisation", StatusUpdateDateTime: time:utcToString(time:utcNow()), CreationDateTime: time:utcToString(time:utcNow()), 
        TransactionFromDateTime: check consentResource.Data.TransactionFromDateTime, TransactionToDateTime: check consentResource.Data.TransactionToDateTime, ExpirationDateTime: check consentResource.Data.ExpirationDateTime, 
-       Permissions: check consentResource.Data.Permissions.ensureType(), Meta: check consentResource.Meta.ensureType(), Risk: check consentResource.Risk.ensureType(), Links: object {}};
+       Permissions: check consentResource.Data.Permissions.ensureType()};
 
         accountConsents.add(accConsent);
 
