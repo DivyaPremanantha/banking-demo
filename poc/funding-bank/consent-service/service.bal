@@ -36,7 +36,7 @@ service / on new http:Listener(9090) {
 
         AccountConsent accConsent = {ConsentId: accountConsentId, Status: "AwaitingAuthorisation", StatusUpdateDateTime: time:utcToString(time:utcNow()), CreationDateTime: time:utcToString(time:utcNow()), 
        TransactionFromDateTime: check consentResource.Data.Status.TransactionFromDateTime, TransactionToDateTime: check consentResource.Data.Status.TransactionToDateTime, ExpirationDateTime: check consentResource.Data.Status.ExpirationDateTime, 
-       Permissions: check consentResource.Data.Status.Permissions.ensureType(), Meta: check consentResource.Data.Status.Meta.ensureType(), Risk: check consentResource.Data.Status.Risk.ensureType(), Links: object {}};
+       Permissions: check consentResource.Data.Status.Permissions.ensureType(), Meta: check consentResource.Data.Meta.ensureType(), Risk: check consentResource.Data.Risk.ensureType(), Links: object {}};
 
         accountConsents.add(accConsent);
 
