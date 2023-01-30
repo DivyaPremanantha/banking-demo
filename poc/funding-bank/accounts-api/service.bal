@@ -19,7 +19,9 @@ service /aopen\-banking/v1\.0/aisp on new http:Listener(9090) {
                 clientSecret: consentServiceClientSecret
             }
         });
+        io:println("Calling the endpoint");
         json|error response = check consentService ->/accountConsents.post(consentResource);
+        io:println("Retrieved the response");
         io:println(response);
 
         if !(response is error) {
