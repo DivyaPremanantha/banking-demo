@@ -67,6 +67,10 @@ service / on new http:Listener(9090) {
     # 
     # + consentResource - the consent resource.
     # + return - account information.
+    @http:ResourceConfig {
+        consumes: ["application/json"],
+        produces: ["application/json"]
+    }
     resource function post accountConsents(@http:Payload json consentResource) returns json|error {
         io:println("Constructing Account Consent Response");
         
@@ -105,6 +109,10 @@ service / on new http:Listener(9090) {
     # 
     # + consentResource - the consent resource.
     # + return - payment information.
+    @http:ResourceConfig {
+        consumes: ["application/json"],
+        produces: ["application/json"]
+    }
     resource function post paymentConsents(@http:Payload json consentResource) returns json|error {
         io:println("Constructing Account Consent Response");
         
