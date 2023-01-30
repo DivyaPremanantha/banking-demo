@@ -6,9 +6,6 @@ import ballerina/uuid;
 # A service representing a network-accessible API
 # bound to port `9090`.
  
-string accountConsentId = uuid:createType1AsString();
-string paymentConsentId = uuid:createType1AsString();
-
 table<PaymentConsent> paymentConsents = table [
 
 ];
@@ -72,16 +69,18 @@ service / on new http:Listener(9090) {
     # + return - account information.
     resource function post accountConsents(@http:Payload json consentResource) returns json|error {
         io:println("Constructing Account Consent Response");
-
-        AccountConsent accountConsent = {ConsentId: paymentConsentId, Status: "AwaitingAuthorisation", StatusUpdateDateTime: time:utcToString(time:utcNow()), CreationDateTime: time:utcToString(time:utcNow()), 
+        
+        AccountConsent|error accountConsent = {ConsentId: uuid:createType1AsString(), Status: "AwaitingAuthorisation", StatusUpdateDateTime: time:utcToString(time:utcNow()), CreationDateTime: time:utcToString(time:utcNow()), 
        TransactionFromDateTime: check consentResource.Data.TransactionFromDateTime, TransactionToDateTime: check consentResource.Data.TransactionToDateTime, ExpirationDateTime: check consentResource.Data.ExpirationDateTime, 
        Permissions: check consentResource.Data.Permissions.ensureType()};
 
-        accountConsents.add(accountConsent);
-
-        io:println("Account Consent Response Constructed");
-        
-        return accountConsent.toString().toJson();
+        if !(accountConsent is error) {
+            accountConsents.add(accountConsent);
+            io:println("Account Consent Response Constructed");
+            return accountConsent.toString().toJson();
+        } else {
+            return accountConsent;
+        }
     }
 
     # A resource for getting account consent.
@@ -108,16 +107,15 @@ service / on new http:Listener(9090) {
     resource function post paymentConsents(@http:Payload json consentResource) returns json|error {
         io:println("Constructing Account Consent Response");
         
-        PaymentConsent paymentConsent = {ConsentId: accountConsentId, Status: "AwaitingAuthorisation", StatusUpdateDateTime: time:utcToString(time:utcNow()), CreationDateTime: time:utcToString(time:utcNow()), Permissions: check consentResource.Data.Permissions.ensureType(), 
-        Initiation: {Reference: check consentResource.Data.Initiation.Reference.ensureType(), FirstPaymentDateTime: check consentResource.Data.Initiation.FirstPaymentDateTime.ensureType(), FinalPaymentDateTime: check consentResource.Data.Initiation.FinalPaymentDateTime.ensureType(), 
-        DebtorAccount: {Identification: check consentResource.Data.Initiation.DebtorAccount.Identification.ensureType(), Name: check consentResource.Data.Initiation.DebtorAccount.Name.ensureType()}, CreditorAccount: {Identification: check consentResource.Data.Initiation.CreditorAccount.Identification.ensureType(), 
-        Name: check consentResource.Data.Initiation.CreditorAccount.Name.ensureType()}, InstructedAmount: {Amount: check consentResource.Data.Initiation.InstructedAmount.Amount.ensureType(), Currency: check consentResource.Data.Initiation.InstructedAmount.Currency.ensureType()}}};
+        PaymentConsent|error paymentConsent = generatePaymentConsent(consentResource);
 
-        paymentConsents.add(paymentConsent);
-
-        io:println("Payment Consent Response Constructed");
-        
-        return paymentConsent.toString().toJson();
+        if !(paymentConsent is error) {
+            io:println("Payment Consent Response Constructed");
+            paymentConsents.add(paymentConsent);
+            return paymentConsent.toString().toJson();
+        } else {
+            return paymentConsent;
+        }
     }
 
     # A resource for returning payment consent.
@@ -136,4 +134,13 @@ service / on new http:Listener(9090) {
             return {};
         }
     }
+}
+
+function generatePaymentConsent(json consentResource) returns PaymentConsent|error {
+    return  {ConsentId: uuid:createType1AsString(), Status: "AwaitingAuthorisation", StatusUpdateDateTime: time:utcToString(time:utcNow()), CreationDateTime: time:utcToString(time:utcNow()), 
+        Permissions: check consentResource.Data.Permissions.ensureType(), Initiation: {Reference: check consentResource.Data.Initiation.Reference.ensureType(), 
+        FirstPaymentDateTime: check consentResource.Data.Initiation.FirstPaymentDateTime.ensureType(), FinalPaymentDateTime: check consentResource.Data.Initiation.FinalPaymentDateTime.ensureType(), 
+        DebtorAccount: {Identification: check consentResource.Data.Initiation.DebtorAccount.Identification.ensureType(), Name: check consentResource.Data.Initiation.DebtorAccount.Name.ensureType()}, 
+        CreditorAccount: {Identification: check consentResource.Data.Initiation.CreditorAccount.Identification.ensureType(), Name: check consentResource.Data.Initiation.CreditorAccount.Name.ensureType()}, 
+        InstructedAmount: {Amount: check consentResource.Data.Initiation.InstructedAmount.Amount.ensureType(), Currency: check consentResource.Data.Initiation.InstructedAmount.Currency.ensureType()}}};
 }
