@@ -114,7 +114,7 @@ service / on new http:Listener(9090) {
         produces: ["application/json"]
     }
     resource function post paymentConsents(@http:Payload json consentResource) returns json|error {
-        io:println("Constructing Account Consent Response");
+        io:println("Constructing Payment Consent Response");
         
         PaymentConsent|error paymentConsent = generatePaymentConsent(consentResource);
 

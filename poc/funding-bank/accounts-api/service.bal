@@ -1,5 +1,6 @@
 import ballerina/http;
 import cgnzntpoc/fundingbankconsentmanagement;
+import ballerina/io;
 
 # A service representing a network-accessible API
 # bound to port `9090`.
@@ -18,7 +19,14 @@ service /aopen\-banking/v1\.0/aisp on new http:Listener(9090) {
                 clientSecret: consentServiceClientSecret
             }
         });
-        return check consentService ->/accountConsents.post(consentResource);
+        json|error response = check consentService ->/accountConsents.post(consentResource);
+        io:println(response);
+
+        if !(response is error) {
+            return response;
+        } else {
+            return response;
+        }
     }
 
     # Resource to return account consent.
