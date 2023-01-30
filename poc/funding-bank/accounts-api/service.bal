@@ -12,10 +12,6 @@ service /aopen\-banking/v1\.0/aisp on new http:Listener(9090) {
     # Resource for generating account consent.
     # + consentResource - the consent resource.
     # + return - account information.
-    @http:ResourceConfig {
-        consumes: ["application/json"],
-        produces: ["application/json"]
-    }
     resource function post account\-access\-consents(@http:Payload json consentResource) returns json|error {
         fundingbankconsentmanagement:Client consentService = check new (config = {
             auth: {
@@ -23,16 +19,9 @@ service /aopen\-banking/v1\.0/aisp on new http:Listener(9090) {
                 clientSecret: consentServiceClientSecret
             }
         });
-        io:println("Calling the endpoint");
-        json|error response = check consentService ->/accountConsents.post(consentResource);
-        io:println("Retrieved the response");
-        io:println(response);
-
-        if !(response is error) {
-            return response;
-        } else {
-            return response;
-        }
+        
+        io:println("Account Consent Service to generate consent invoked");
+        return check consentService ->/accountConsents.post(consentResource);
     }
 
     # Resource to return account consent.
@@ -45,6 +34,7 @@ service /aopen\-banking/v1\.0/aisp on new http:Listener(9090) {
                 clientSecret: consentServiceClientSecret
             }
         });
+        io:println("Account Consent Service to retrieve consent invoked");
         return check consentService ->/accountConsents(consentId);
     }
 }

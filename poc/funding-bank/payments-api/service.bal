@@ -23,7 +23,7 @@ service /aopen\-banking/v1\.0/aisp on new http:Listener(9090) {
                 clientSecret: consentServiceClientSecret
             }
         });
-        io:println("Account Consent Service Invoked");
+        io:println("Payment Consent Service to generate consent invoked");
         return check consentService ->/paymentConsents.post(consentResource);
     }
 
@@ -37,6 +37,7 @@ service /aopen\-banking/v1\.0/aisp on new http:Listener(9090) {
                 clientSecret: consentServiceClientSecret
             }
         });
+        io:println("Payment Consent Service to retrieve consent invoked");
         return check consentService ->/paymentConsents(consentId);
     }
 }
