@@ -36,7 +36,7 @@ service / on new http:Listener(9090) {
 
         AccountConsent accConsent = {ConsentId: accountConsentId, Status: "AwaitingAuthorisation", StatusUpdateDateTime: time:utcToString(time:utcNow()), CreationDateTime: time:utcToString(time:utcNow()), 
        TransactionFromDateTime: check consentResource.Data.TransactionFromDateTime, TransactionToDateTime: check consentResource.Data.TransactionToDateTime, ExpirationDateTime: check consentResource.Data.ExpirationDateTime, 
-       Permissions: check consentResource.Data.Permissions.ensureType(), Meta: check consentResource.Data.Meta.ensureType(), Risk: check consentResource.Data.Risk.ensureType(), Links: object {}};
+       Permissions: check consentResource.Data.Permissions.ensureType(), Meta: check consentResource.Meta.ensureType(), Risk: check consentResource.Risk.ensureType(), Links: object {}};
 
         accountConsents.add(accConsent);
 
@@ -63,5 +63,12 @@ service / on new http:Listener(9090) {
     # + consentResource - the consent resource.
     # + return - payment information.
     resource function post paymentConsents(@http:Payload json consentResource) returns json|error {
+    }
+
+    # A resource for returning payment consent.
+    # 
+    # + consentID - the consent ID.
+    # + return - payment information.
+    resource function get paymentConsents(string consentID) returns json|error {
     }
 }
