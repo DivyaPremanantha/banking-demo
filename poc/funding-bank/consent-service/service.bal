@@ -20,7 +20,7 @@ type AccountConsent record {
     string TransactionFromDateTime;
     string TransactionToDateTime;
     string ExpirationDateTime;
-    string[] Permissions;
+    json[] Permissions;
     object{} Meta;
     object{} Risk;
     object{} Links;
