@@ -35,8 +35,8 @@ service / on new http:Listener(9090) {
         io:println("Constructing Account Consent Response");
 
         AccountConsent accConsent = {ConsentId: accountConsentId, Status: "AwaitingAuthorisation", StatusUpdateDateTime: time:utcToString(time:utcNow()), CreationDateTime: time:utcToString(time:utcNow()), 
-       TransactionFromDateTime: check consentResource.Data.Status.TransactionFromDateTime, TransactionToDateTime: check consentResource.Data.Status.TransactionToDateTime, ExpirationDateTime: check consentResource.Data.Status.ExpirationDateTime, 
-       Permissions: check consentResource.Data.Status.Permissions.ensureType(), Meta: check consentResource.Data.Meta.ensureType(), Risk: check consentResource.Data.Risk.ensureType(), Links: object {}};
+       TransactionFromDateTime: check consentResource.Data.TransactionFromDateTime, TransactionToDateTime: check consentResource.Data.TransactionToDateTime, ExpirationDateTime: check consentResource.Data.ExpirationDateTime, 
+       Permissions: check consentResource.Data.Permissions.ensureType(), Meta: check consentResource.Data.Meta.ensureType(), Risk: check consentResource.Data.Risk.ensureType(), Links: object {}};
 
         accountConsents.add(accConsent);
 
@@ -56,5 +56,12 @@ service / on new http:Listener(9090) {
 
         io:println("Account Consent Response Retrieved");
         return accountConsent[0].toString().toJson();
+    }
+
+    # A resource for generating payment consent.
+    # 
+    # + consentResource - the consent resource.
+    # + return - payment information.
+    resource function post paymentConsents(@http:Payload json consentResource) returns json|error {
     }
 }
