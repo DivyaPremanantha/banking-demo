@@ -81,7 +81,7 @@ service / on new http:Listener(9090) {
         if !(accountConsent is error) {
             accountConsents.add(accountConsent);
             io:println("Account Consent Response Constructed");
-            return accountConsent.toString().toJson();
+            return accountConsent.toJson();
         } else {
             io:println("Error in constructing the Account Consent Response");
             return accountConsent;
