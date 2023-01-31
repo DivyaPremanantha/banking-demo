@@ -37,7 +37,7 @@ service / on new http:Listener(9090) {
             http:Request tokenExchangeReq = new;
             check tokenExchangeReq.setContentType(mime:APPLICATION_FORM_URLENCODED);
 
-            if regex:matches(scope, "payments") {
+            if regex:matches(scope, "/payments/") {
                 tokenExchangeReq.setTextPayload("&grant_type=urn:ietf:params:oauth:grant-type:token-exchange&subject_token=" + accessTokenAS +
                                     "&subject_token_type=urn:ietf:params:oauth:token-type:access_token&scope=openid%payments");
             } else {
