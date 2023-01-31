@@ -17,7 +17,7 @@ service / on new http:Listener(9090) {
         http:Request req = new;
         check req.setContentType(mime:APPLICATION_FORM_URLENCODED);
         req.setTextPayload("code=" + code + "&grant_type=authorization_code&client_id=" + clientId + "&client_secret=" + clinetSecret + "&redirect_uri=" + redirectURI);
-        io:println(req);
+        io:println(req.getTextPayload());
         io:println("Asgardeo token request sent");
 
         http:Response response = <http:Response>check httpEp->post("/", req);
