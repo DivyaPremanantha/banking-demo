@@ -33,7 +33,7 @@ service / on new http:Listener(9090) {
 
         io:println("Redirecting to the authorization endpoint");
 
-        if regex:matches(scope, "/payments/") {
+        if regex:matches(scope, "^.*payments.*$") {
             return "https://api.asgardeo.io/t/fundingbank/oauth2/authorize?scope=" + encodedScope + "&response_type=code&redirect_uri=" + redirect_uri + "&client_id=" + paymentsAppClientId;
         } else {
             return "https://api.asgardeo.io/t/fundingbank/oauth2/authorize?scope=" + encodedScope + "&response_type=code&redirect_uri=" + redirect_uri + "&client_id=" + accountsApplientId;
