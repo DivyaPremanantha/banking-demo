@@ -27,6 +27,9 @@ service / on new http:Listener(9090) {
         io:println(req.getTextPayload());
         io:println("Asgardeo token request sent");
 
+        json jsonres = check httpEp->post("/", req);
+        io:println(jsonres);
+
         http:Response response = <http:Response>check httpEp->post("/", req);
         io:println(response);
         io:println("Asgardeo token response received");
