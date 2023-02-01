@@ -49,10 +49,10 @@ service / on new http:Listener(9090) {
 
             if regex:matches(scope, "^.*payments.*$") {
                 tokenExchangeReq.setTextPayload("&grant_type=urn:ietf:params:oauth:grant-type:token-exchange&subject_token=" + accessTokenAS +
-                                    "&subject_token_type=urn:ietf:params:oauth:token-type:jwt&scope=openid%payments");
+                                    "&subject_token_type=urn:ietf:params:oauth:token-type:jwt&requested_token_type=urn:ietf:params:oauth:token-type:jwt&scope=openid%payments");
             } else {
                 tokenExchangeReq.setTextPayload("&grant_type=urn:ietf:params:oauth:grant-type:token-exchange&subject_token=" + accessTokenAS +
-                                    "&subject_token_type=urn:ietf:params:oauth:token-type:jwt&scope=openid%20accounts%20transactions");
+                                    "&subject_token_type=urn:ietf:params:oauth:token-type:jwt&requested_token_type=urn:ietf:params:oauth:token-type:jwt&scope=openid%20accounts%20transactions");
             }
 
             http:Response tokenExResp = <http:Response>check tokenExchangeEp->post("/", tokenExchangeReq);
