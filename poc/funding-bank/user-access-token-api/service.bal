@@ -24,7 +24,6 @@ service / on new http:Listener(9090) {
             req.setTextPayload("code=" + code + "&grant_type=authorization_code&client_id=" + accountAppClientId + "&client_secret=" + accountAppClinetSecret + "&redirect_uri=" + redirectURI);
         }
         
-        io:println(req.getTextPayload());
         io:println("Asgardeo token request sent");
 
         http:Response response = <http:Response>check httpEp->post("/", req);
@@ -48,17 +47,16 @@ service / on new http:Listener(9090) {
 
             if regex:matches(scope, "^.*payments.*$") {
                 tokenExchangeReq.setTextPayload("&grant_type=urn:ietf:params:oauth:grant-type:token-exchange&subject_token=" + accessTokenAS +
-                                    "&subject_token_type=urn:ietf:params:oauth:token-type:access_token&scope=openid%payments");
+                                    "&subject_token_type=urn:ietf:params:oauth:token-type:jwt&requested_token_type=urn:ietf:params:oauth:token-type:jwt&scope=openid%payments");
             } else {
                 tokenExchangeReq.setTextPayload("&grant_type=urn:ietf:params:oauth:grant-type:token-exchange&subject_token=" + accessTokenAS +
-                                    "&subject_token_type=urn:ietf:params:oauth:token-type:access_token&scope=openid%20accounts%20transactions");
+                                    "&subject_token_type=urn:ietf:params:oauth:token-type:jwt&requested_token_type=urn:ietf:params:oauth:token-type:jwt&scope=openid%20accounts%20transactions");
             }
 
             http:Response tokenExResp = <http:Response>check tokenExchangeEp->post("/", tokenExchangeReq);
             json tokenExResponse = check tokenExResp.getJsonPayload();
 
             io:println("Response received from Choreo");
-            io:println(tokenExResponse);
             return tokenExResponse;
         } else {
             io:println("Error in receiving access token from Asgardeo");
