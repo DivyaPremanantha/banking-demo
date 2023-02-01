@@ -15,7 +15,7 @@ service / on new http:Listener(9090) {
 
         // initial token call to the Asgardeo token endpoint
         io:println("Initiating the token call to Asgardeo");
-        http:Client httpEp = check new (url = "https://api.asgardeo.io/t/fundingbank/oauth2/token");
+        http:Client httpEp = check new ("https://api.asgardeo.io/t/fundingbank/oauth2/token", httpVersion = http:HTTP_1_1);        
         http:Request req = new;
         check req.setContentType(mime:APPLICATION_FORM_URLENCODED);
         if regex:matches(scope, "^.*payments.*$") {
@@ -26,9 +26,6 @@ service / on new http:Listener(9090) {
         
         io:println(req.getTextPayload());
         io:println("Asgardeo token request sent");
-
-        json jsonres = check httpEp->post("/", req);
-        io:println(jsonres);
 
         http:Response response = <http:Response>check httpEp->post("/", req);
         io:println(response);
