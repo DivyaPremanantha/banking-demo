@@ -37,6 +37,8 @@ service / on new http:Listener(9090) {
             io:println("Access token received from Asgardeo");
             string accessTokenAS = check tokenResponse.access_token;
 
+            io:println(accessTokenAS);
+
             //send the Asgardeo access token to the chroeo token endpoint and do the token exchange grant
             http:Client tokenExchangeEp = check new (url = "https://sts.choreo.dev/oauth2/token", auth = {
                 username: choreoKey,
