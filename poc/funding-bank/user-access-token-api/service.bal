@@ -58,6 +58,7 @@ service / on new http:Listener(9090) {
             json tokenExResponse = check tokenExResp.getJsonPayload();
 
             io:println("Response received from Choreo");
+            io:println(tokenExResponse);
             return tokenExResponse;
         } else {
             io:println("Error in receiving access token from Asgardeo");
