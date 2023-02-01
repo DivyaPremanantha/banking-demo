@@ -4,7 +4,7 @@ import ballerina/io;
 # A service representing a network-accessible API
 # bound to port `9090`.
 
-configurable string accountsApplientId = ?;
+configurable string accountsAppClientId = ?;
 configurable string paymentsAppClientId = ?;
 
 service / on new http:Listener(9090) {
@@ -14,7 +14,7 @@ service / on new http:Listener(9090) {
             io:println("ConsentID is not sent in request");
             return "https://accounts.asgardeo.io/t/fundingbank/authenticationendpoint/oauth2_error.do?oauthErrorCode=invalid_request&oauthErrorMsg=Empty+ConsentID";
         }
-        if accountsApplientId is "" || paymentsAppClientId is "" {
+        if accountsAppClientId is "" || paymentsAppClientId is "" {
             io:println("ClientID is not sent in request");
             return "https://accounts.asgardeo.io/t/fundingbank/authenticationendpoint/oauth2_error.do?oauthErrorCode=invalid_request&oauthErrorMsg=Invalid+authorization+request";
         }
@@ -36,7 +36,7 @@ service / on new http:Listener(9090) {
         if regex:matches(scope, "^.*payments.*$") {
             return "https://api.asgardeo.io/t/fundingbank/oauth2/authorize?scope=" + encodedScope + "&response_type=code&redirect_uri=" + redirect_uri + "&client_id=" + paymentsAppClientId;
         } else {
-            return "https://api.asgardeo.io/t/fundingbank/oauth2/authorize?scope=" + encodedScope + "&response_type=code&redirect_uri=" + redirect_uri + "&client_id=" + accountsApplientId;
+            return "https://api.asgardeo.io/t/fundingbank/oauth2/authorize?scope=" + encodedScope + "&response_type=code&redirect_uri=" + redirect_uri + "&client_id=" + accountsAppClientId;
         }
     }
 }

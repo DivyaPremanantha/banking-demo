@@ -5,8 +5,10 @@ import ballerina/regex;
 
 # A service representing a network-accessible API
 # bound to port `9090`.
-configurable string clientId = ?;
-configurable string clinetSecret = ?;
+configurable string paymentAppClientId = ?;
+configurable string paymentAppClinetSecret = ?;
+configurable string accountAppClientId = ?;
+configurable string accountAppClinetSecret = ?;
 service / on new http:Listener(9090) {
 
     resource function get userAccessToken(string code, string scope, string redirectURI, string choreoKey = "", string choreoSecret = "") returns error|json? {
@@ -16,7 +18,12 @@ service / on new http:Listener(9090) {
         http:Client httpEp = check new (url = "https://api.asgardeo.io/t/fundingbank/oauth2/token");
         http:Request req = new;
         check req.setContentType(mime:APPLICATION_FORM_URLENCODED);
-        req.setTextPayload("code=" + code + "&grant_type=authorization_code&client_id=" + clientId + "&client_secret=" + clinetSecret + "&redirect_uri=" + redirectURI);
+        if regex:matches(scope, "^.*payments.*$") {
+            req.setTextPayload("code=" + code + "&grant_type=authorization_code&client_id=" + paymentAppClientId + "&client_secret=" + paymentAppClinetSecret + "&redirect_uri=" + redirectURI);
+        } else {
+            req.setTextPayload("code=" + code + "&grant_type=authorization_code&client_id=" + accountAppClientId + "&client_secret=" + accountAppClinetSecret + "&redirect_uri=" + redirectURI);
+        }
+        
         io:println(req.getTextPayload());
         io:println("Asgardeo token request sent");
 
