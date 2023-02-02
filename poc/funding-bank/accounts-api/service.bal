@@ -48,8 +48,8 @@ service /aopen\-banking/v1\.0/aisp on new http:Listener(9090) {
         io:println("Accounts endpoint invoked");
         fundingbankbackend:Client fundingbankbackendEp = check new (config = {
             auth: {
-                clientId: consentServiceClientId,
-                clientSecret: consentServiceClientSecret
+                clientId: fundingBankClientId,
+                clientSecret: fundingBankClientSecret
             }
         });
         return check fundingbankbackendEp ->/acounts();
@@ -62,8 +62,8 @@ service /aopen\-banking/v1\.0/aisp on new http:Listener(9090) {
         io:println("Transactions endpoint invoked");
         fundingbankbackend:Client fundingbankbackendEp = check new (config = {
             auth: {
-                clientId: consentServiceClientId,
-                clientSecret: consentServiceClientSecret
+                clientId: fundingBankClientId,
+                clientSecret: fundingBankClientSecret
             }
         });
         return check fundingbankbackendEp ->/transactions;

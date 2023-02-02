@@ -7,6 +7,8 @@ import ballerina/io;
 # bound to port `9090`.
 configurable string consentServiceClientId = ?;
 configurable string consentServiceClientSecret = ?;
+configurable string fundingBankClientId = ?;
+configurable string fundingBankClientSecret = ?;
 
 service /aopen\-banking/v1\.0/aisp on new http:Listener(9090) {
 
@@ -34,8 +36,8 @@ service /aopen\-banking/v1\.0/aisp on new http:Listener(9090) {
     resource function get payment\-access\-consents(string consentId) returns json|error {
         fundingbankconsentmanagement:Client consentService = check new (config = {
             auth: {
-                clientId: consentServiceClientId,
-                clientSecret: consentServiceClientSecret
+                clientId: fundingBankClientId,
+                clientSecret: fundingBankClientSecret
             }
         });
         io:println("Payment Consent Service to retrieve consent invoked");
@@ -49,8 +51,8 @@ service /aopen\-banking/v1\.0/aisp on new http:Listener(9090) {
         io:println("Accounts endpoint invoked");
         fundingbankbackend:Client fundingbankbackendEp = check new (config = {
             auth: {
-                clientId: consentServiceClientId,
-                clientSecret: consentServiceClientSecret
+                clientId: fundingBankClientId,
+                clientSecret: fundingBankClientSecret
             }
         });
         return check fundingbankbackendEp ->/payments.post(paymentResource);
