@@ -1,5 +1,6 @@
 import ballerina/http;
 import cgnzntpoc/fundingbankconsentmanagement;
+import cgnzntpoc/fundingbankbackend;
 import ballerina/io;
 
 # A service representing a network-accessible API
@@ -39,5 +40,19 @@ service /aopen\-banking/v1\.0/aisp on new http:Listener(9090) {
         });
         io:println("Payment Consent Service to retrieve consent invoked");
         return check consentService ->/paymentConsents(consentId);
+    }
+
+    # Resource to return payments.
+    # + return - account information.
+    resource function post payments(@http:Payload json paymentResource) returns json|error {
+        
+        io:println("Accounts endpoint invoked");
+        fundingbankbackend:Client fundingbankbackendEp = check new (config = {
+            auth: {
+                clientId: consentServiceClientId,
+                clientSecret: consentServiceClientSecret
+            }
+        });
+        return check fundingbankbackendEp ->/payments.post(paymentResource);
     }
 }
