@@ -35,6 +35,8 @@ service / on new http:Listener(9090) {
 
         if !(tokenResponse.access_token is error) {
             io:println("Access token received from Asgardeo");
+
+            // Get id_token and exchange
             string accessTokenAS = check tokenResponse.access_token;
 
             io:println(accessTokenAS);
