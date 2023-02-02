@@ -1,15 +1,19 @@
 import ballerina/http;
 import ballerina/regex;
 import ballerina/io;
+import cgnzntpoc/fundingbankconsentmanagement;
+
 # A service representing a network-accessible API
 # bound to port `9090`.
 
 configurable string accountsAppClientId = ?;
 configurable string paymentsAppClientId = ?;
-
+configurable string consentServiceClientId = ?;
+configurable string consentServiceClientSecret = ?;
+boolean isValidConsentID = false;
 service / on new http:Listener(9090) {
 
-    resource function get authorize(string redirect_uri, string scope, string consentID) returns string {
+    resource function get authorize(string redirect_uri, string scope, string consentID) returns string|error {
         if consentID is "" {
             io:println("ConsentID is not sent in request");
             return "https://accounts.asgardeo.io/t/fundingbank/authenticationendpoint/oauth2_error.do?oauthErrorCode=invalid_request&oauthErrorMsg=Empty+ConsentID";
@@ -29,6 +33,24 @@ service / on new http:Listener(9090) {
                 return "https://accounts.asgardeo.io/t/fundingbank/authenticationendpoint/oauth2_error.do?oauthErrorCode=invalid_request&oauthErrorMsg=Invalid+scopes";
             }
         }
+
+        fundingbankconsentmanagement:Client consentService = check new (config = {
+            auth: {
+                clientId: consentServiceClientId,
+                clientSecret: consentServiceClientSecret
+            }
+        });
+
+        if regex:matches(scope, "^.*payments.*$") {
+            isValidConsentID = check consentService ->/validateConsents(consentID, "payments");
+        } else {
+            isValidConsentID = check consentService ->/validateConsents(consentID, "accounts");
+        }
+
+        if !(isValidConsentID) {
+            return "https://accounts.asgardeo.io/t/fundingbank/authenticationendpoint/oauth2_error.do?oauthErrorCode=invalid_consentID&oauthErrorMsg=Invalid+consentID";
+        }
+
         string encodedScope = regex:replace(scope, " ", "%20");
 
         io:println("Redirecting to the authorization endpoint");
