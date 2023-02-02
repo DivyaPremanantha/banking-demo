@@ -41,8 +41,12 @@ service / on new http:Listener(9090) {
             }
         });
 
+        string encodedScope = regex:replace(scope, " ", "%20");
+
         if regex:matches(scope, "^.*payments.*$") {
             isValidConsentID = check consentService ->/validateConsents(consentID, "payments");
+            io:println(scope);
+            io:println(isValidConsentID);
         } else {
             isValidConsentID = check consentService ->/validateConsents(consentID, "accounts");
         }
@@ -50,8 +54,6 @@ service / on new http:Listener(9090) {
         if !(isValidConsentID) {
             return "https://accounts.asgardeo.io/t/fundingbank/authenticationendpoint/oauth2_error.do?oauthErrorCode=invalid_consentID&oauthErrorMsg=Invalid+consentID";
         }
-
-        string encodedScope = regex:replace(scope, " ", "%20");
 
         io:println("Redirecting to the authorization endpoint");
 
