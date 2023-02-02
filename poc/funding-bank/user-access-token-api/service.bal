@@ -36,10 +36,7 @@ service / on new http:Listener(9090) {
         if !(tokenResponse.access_token is error) {
             io:println("Access token received from Asgardeo");
 
-            // Get id_token and exchange
-            string accessTokenAS = check tokenResponse.access_token;
-
-            io:println(accessTokenAS);
+            string idTokenAS = check tokenResponse.id_token;
 
             //send the Asgardeo access token to the chroeo token endpoint and do the token exchange grant
             http:Client tokenExchangeEp = check new (url = "https://sts.choreo.dev/oauth2/token", auth = {
@@ -50,10 +47,10 @@ service / on new http:Listener(9090) {
             check tokenExchangeReq.setContentType(mime:APPLICATION_FORM_URLENCODED);
 
             if regex:matches(scope, "^.*payments.*$") {
-                tokenExchangeReq.setTextPayload("&grant_type=urn:ietf:params:oauth:grant-type:token-exchange&subject_token=" + accessTokenAS +
+                tokenExchangeReq.setTextPayload("&grant_type=urn:ietf:params:oauth:grant-type:token-exchange&subject_token=" + idTokenAS +
                                     "&subject_token_type=urn:ietf:params:oauth:token-type:jwt&requested_token_type=urn:ietf:params:oauth:token-type:jwt&scope=openid%payments");
             } else {
-                tokenExchangeReq.setTextPayload("&grant_type=urn:ietf:params:oauth:grant-type:token-exchange&subject_token=" + accessTokenAS +
+                tokenExchangeReq.setTextPayload("&grant_type=urn:ietf:params:oauth:grant-type:token-exchange&subject_token=" + idTokenAS +
                                     "&subject_token_type=urn:ietf:params:oauth:token-type:jwt&requested_token_type=urn:ietf:params:oauth:token-type:jwt&scope=openid%20accounts%20transactions");
             }
 
