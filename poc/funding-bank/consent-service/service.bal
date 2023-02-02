@@ -2,6 +2,7 @@ import ballerina/http;
 import ballerina/time;
 import ballerina/io;
 import ballerina/uuid;
+import ballerina/regex;
 
 # A service representing a network-accessible API
 # bound to port `9090`.
@@ -147,12 +148,12 @@ service / on new http:Listener(9090) {
     # + consentID - the consent ID.
     # + return - payment information.
     resource function get validateConsents(string consentID, string scope) returns boolean|error {
-        if (scope.equalsIgnoreCaseAscii("payments")) {
+        if (regex:matches(scope, "^.*payments.*$")) {
             PaymentConsent[] paymentConsent = from var consent in paymentConsents
                 where consent.ConsentId == consentID
                 select consent;
 
-            io:println("Account Consent Response Retrieved");
+            io:println("Payment Consent Response Retrieved");
             if (paymentConsent.length() > 0) {
                 return true;
             } else {
