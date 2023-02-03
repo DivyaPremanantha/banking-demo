@@ -149,6 +149,9 @@ service / on new http:Listener(9090) {
     # + return - payment information.
     resource function get validateConsents(string consentID, string scope) returns boolean|error {
         if (regex:matches(scope, "^.*payments.*$")) {
+            io:println("paymeny Consent");
+            io:println(paymentConsents);
+            io:println(consentID);
             PaymentConsent[] paymentConsent = from var consent in paymentConsents
                 where consent.ConsentId == consentID
                 select consent;
