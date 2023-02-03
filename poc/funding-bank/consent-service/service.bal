@@ -160,6 +160,8 @@ service / on new http:Listener(9090) {
                 return false;
             }
         } else {
+            io:println("Account Consent");
+            io:println(accountConsents);
             AccountConsent[] accountConsent = from var consent in accountConsents
                 where consent.ConsentId == consentID
                 select consent;
