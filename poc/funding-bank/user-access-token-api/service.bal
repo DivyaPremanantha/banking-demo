@@ -54,6 +54,8 @@ service / on new http:Listener(9090) {
                                     "&subject_token_type=urn:ietf:params:oauth:token-type:jwt&requested_token_type=urn:ietf:params:oauth:token-type:jwt&scope=openid%20accounts%20transactions");
             }
 
+            io:println(idTokenAS);
+
             http:Response tokenExResp = <http:Response>check tokenExchangeEp->post("/", tokenExchangeReq);
             json tokenExResponse = check tokenExResp.getJsonPayload();
 
