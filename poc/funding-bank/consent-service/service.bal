@@ -162,11 +162,13 @@ service / on new http:Listener(9090) {
         } else {
             io:println("Account Consent");
             io:println(accountConsents);
-            AccountConsent[] accountConsent = from var consent in accountConsents
-                where consent.ConsentId == consentID
-                select consent;
+            io:println(consentID);
+            AccountConsent[] accountConsent = from var accConsent in accountConsents
+                where accConsent.ConsentId == consentID
+                select accConsent;
 
             io:println("Account Consent Response Retrieved");
+            io:println(accountConsent);
             if (accountConsent.length() > 0) {
                 return true;
             } else {
