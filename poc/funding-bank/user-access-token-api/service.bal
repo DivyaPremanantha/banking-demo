@@ -27,7 +27,6 @@ service / on new http:Listener(9090) {
         io:println("Asgardeo token request sent");
 
         http:Response response = <http:Response>check httpEp->post("/", req);
-        io:println(response);
         io:println("Asgardeo token response received");
 
         //receive user access token from Asgardeo
@@ -48,13 +47,11 @@ service / on new http:Listener(9090) {
 
             if regex:matches(scope, "^.*payments.*$") {
                 tokenExchangeReq.setTextPayload("&grant_type=urn:ietf:params:oauth:grant-type:token-exchange&subject_token=" + idTokenAS +
-                                    "&subject_token_type=urn:ietf:params:oauth:token-type:jwt&requested_token_type=urn:ietf:params:oauth:token-type:jwt&scope=openid%payments");
+                                    "&subject_token_type=urn:ietf:params:oauth:token-type:jwt&requested_token_type=urn:ietf:params:oauth:token-type:jwt&scope=openid%20payments");
             } else {
                 tokenExchangeReq.setTextPayload("&grant_type=urn:ietf:params:oauth:grant-type:token-exchange&subject_token=" + idTokenAS +
                                     "&subject_token_type=urn:ietf:params:oauth:token-type:jwt&requested_token_type=urn:ietf:params:oauth:token-type:jwt&scope=openid%20accounts%20transactions");
             }
-
-            io:println(idTokenAS);
 
             http:Response tokenExResp = <http:Response>check tokenExchangeEp->post("/", tokenExchangeReq);
             json tokenExResponse = check tokenExResp.getJsonPayload();
