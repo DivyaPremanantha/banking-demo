@@ -7,7 +7,7 @@ import ballerina/regex;
 # A service representing a network-accessible API
 # bound to port `9090`.
 
-table<PaymentConsent> paymentConsents = table [
+table<PaymentConsent> paymentConsentsTable = table [
 
 ];
 
@@ -45,7 +45,7 @@ type InstructedAmountRecord record {
     string Currency;
 };
 
-table<AccountConsent> accountConsents = table [
+table<AccountConsent> accountConsentsTable = table [
 
 ];
 
@@ -81,7 +81,7 @@ service / on new http:Listener(9090) {
         };
 
         if !(accountConsent is error) {
-            accountConsents.add(accountConsent);
+            accountConsentsTable.add(accountConsent);
             io:println("Account Consent Response Constructed");
             return accountConsent.toJson();
         } else {
@@ -95,7 +95,7 @@ service / on new http:Listener(9090) {
     # + consentID - the consent ID.
     # + return - account information.
     resource function get accountConsents(string consentID) returns json|error {
-        AccountConsent[] accountConsent = from var consent in accountConsents
+        AccountConsent[] accountConsent = from var consent in accountConsentsTable
             where consent.ConsentId == consentID
             select consent;
 
@@ -118,7 +118,7 @@ service / on new http:Listener(9090) {
 
         if !(paymentConsent is error) {
             io:println("Payment Consent Response Constructed");
-            paymentConsents.add(paymentConsent);
+            paymentConsentsTable.add(paymentConsent);
             return paymentConsent.toJson();
         } else {
             io:println("Error in constructing the Payment Consent Response");
@@ -131,7 +131,7 @@ service / on new http:Listener(9090) {
     # + consentID - the consent ID.
     # + return - payment information.
     resource function get paymentConsents(string consentID) returns json|error {
-        PaymentConsent[] paymentConsent = from var consent in paymentConsents
+        PaymentConsent[] paymentConsent = from var consent in paymentConsentsTable
             where consent.ConsentId == consentID
             select consent;
 
@@ -150,9 +150,9 @@ service / on new http:Listener(9090) {
     resource function get validateConsents(string consentID, string scope) returns boolean|error {
         if (regex:matches(scope, "^.*payments.*$")) {
             io:println("paymeny Consent");
-            io:println(paymentConsents);
+            io:println(paymentConsentsTable);
             io:println(consentID);
-            PaymentConsent[] paymentConsent = from var consent in paymentConsents
+            PaymentConsent[] paymentConsent = from var consent in paymentConsentsTable
                 where consent.ConsentId == consentID
                 select consent;
 
@@ -164,9 +164,9 @@ service / on new http:Listener(9090) {
             }
         } else {
             io:println("Account Consent");
-            io:println(accountConsents);
+            io:println(accountConsentsTable);
             io:println(consentID);
-            AccountConsent[] accountConsent = from var accConsent in accountConsents
+            AccountConsent[] accountConsent = from var accConsent in accountConsentsTable
                 where accConsent.ConsentId == consentID
                 select accConsent;
 
