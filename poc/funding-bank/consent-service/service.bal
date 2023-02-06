@@ -7,58 +7,58 @@ import ballerina/regex;
 # A service representing a network-accessible API
 # bound to port `9090`.
 
-table<PaymentConsent> paymentConsents = table [
+table<PaymentConsent> key(consentId) paymentConsents = table [
 
 ];
 
-type PaymentConsent record {
-    readonly string ConsentId;
-    string Status;
-    string StatusUpdateDateTime;
-    string CreationDateTime;
-    string Permission;
-    InitiationRecord Initiation;
-};
+type PaymentConsent record {|
+    readonly string consentId;
+    string status;
+    string statusUpdateDateTime;
+    string creationDateTime;
+    string permission;
+    InitiationRecord initiation;
+|};
 
-type InitiationRecord record {
-    string Reference;
-    string FirstPaymentDateTime;
-    string FinalPaymentDateTime;
-    DebtorAccountRecord DebtorAccount;
-    CreditorAccountRecord CreditorAccount;
-    InstructedAmountRecord InstructedAmount;
+type InitiationRecord record {|
+    string reference;
+    string firstPaymentDateTime;
+    string finalPaymentDateTime;
+    DebtorAccountRecord debtorAccount;
+    CreditorAccountRecord creditorAccount;
+    InstructedAmountRecord instructedAmount;
 
-};
+|};
 
-type DebtorAccountRecord record {
-    string Identification;
-    string Name;
-};
+type DebtorAccountRecord record {|
+    string identification;
+    string name;
+|};
 
-type CreditorAccountRecord record {
-    string Identification;
-    string Name;
-};
+type CreditorAccountRecord record {|
+    string identification;
+    string name;
+|};
 
-type InstructedAmountRecord record {
-    string Amount;
-    string Currency;
-};
+type InstructedAmountRecord record {|
+    string amount;
+    string currency;
+|};
 
-table<AccountConsent> accountConsents = table [
+table<AccountConsent> key(consentId) accountConsents = table [
 
 ];
 
-type AccountConsent record {
-    readonly string ConsentId;
-    string Status;
-    string StatusUpdateDateTime;
-    string CreationDateTime;
-    string TransactionFromDateTime;
-    string TransactionToDateTime;
-    string ExpirationDateTime;
-    json[] Permissions;
-};
+type AccountConsent record {|
+    readonly string consentId;
+    string status;
+    string statusUpdateDateTime;
+    string creationDateTime;
+    string transactionFromDateTime;
+    string transactionToDateTime;
+    string expirationDateTime;
+    json[] permissions;
+|};
 
 service / on new http:Listener(9090) {
 
@@ -70,14 +70,14 @@ service / on new http:Listener(9090) {
         io:println("Constructing Account Consent Response");
 
         AccountConsent|error accountConsent = {
-            ConsentId: uuid:createType1AsString(),
-            Status: "AwaitingAuthorisation",
-            StatusUpdateDateTime: time:utcToString(time:utcNow()),
-            CreationDateTime: time:utcToString(time:utcNow()),
-            TransactionFromDateTime: check consentResource.Data.TransactionFromDateTime,
-            TransactionToDateTime: check consentResource.Data.TransactionToDateTime,
-            ExpirationDateTime: check consentResource.Data.ExpirationDateTime,
-            Permissions: check consentResource.Data.Permissions.ensureType()
+            consentId: uuid:createType1AsString(),
+            status: "AwaitingAuthorisation",
+            statusUpdateDateTime: time:utcToString(time:utcNow()),
+            creationDateTime: time:utcToString(time:utcNow()),
+            transactionFromDateTime: check consentResource.Data.TransactionFromDateTime,
+            transactionToDateTime: check consentResource.Data.TransactionToDateTime,
+            expirationDateTime: check consentResource.Data.ExpirationDateTime,
+            permissions: check consentResource.Data.Permissions.ensureType()
         };
 
         if !(accountConsent is error) {
@@ -96,7 +96,7 @@ service / on new http:Listener(9090) {
     # + return - account information.
     resource function get accountConsents(string consentID) returns json|error {
         AccountConsent[] accountConsent = from var consent in accountConsents
-            where consent.ConsentId == consentID
+            where consent.consentId == consentID
             select consent;
 
         io:println("Account Consent Response Retrieved");
@@ -132,7 +132,7 @@ service / on new http:Listener(9090) {
     # + return - payment information.
     resource function get paymentConsents(string consentID) returns json|error {
         PaymentConsent[] paymentConsent = from var consent in paymentConsents
-            where consent.ConsentId == consentID
+            where consent.consentId == consentID
             select consent;
 
         io:println("Account Consent Response Retrieved");
@@ -150,7 +150,7 @@ service / on new http:Listener(9090) {
     resource function get validateConsents(string consentID, string scope) returns boolean|error {
         if (regex:matches(scope, "^.*payments.*$")) {
             PaymentConsent[] paymentConsent = from var consent in paymentConsents
-                where consent.ConsentId == consentID
+                where consent.consentId == consentID
                 select consent;
 
             io:println("Payment Consent Response Retrieved");
@@ -161,7 +161,7 @@ service / on new http:Listener(9090) {
             }
         } else {
             AccountConsent[] accountConsent = from var accConsent in accountConsents
-                where accConsent.ConsentId == consentID
+                where accConsent.consentId == consentID
                 select accConsent;
 
             io:println("Account Consent Response Retrieved");
@@ -182,18 +182,18 @@ service / on new http:Listener(9090) {
 
 function generatePaymentConsent(json consentResource) returns PaymentConsent|error {
     return {
-        ConsentId: uuid:createType1AsString(),
-        Status: "AwaitingAuthorisation",
-        StatusUpdateDateTime: time:utcToString(time:utcNow()),
-        CreationDateTime: time:utcToString(time:utcNow()),
-        Permission: check consentResource.Data.Permission.ensureType(),
-        Initiation: {
-            Reference: check consentResource.Data.Initiation.Reference.ensureType(),
-            FirstPaymentDateTime: check consentResource.Data.Initiation.FirstPaymentDateTime.ensureType(),
-            FinalPaymentDateTime: check consentResource.Data.Initiation.FinalPaymentDateTime.ensureType(),
-            DebtorAccount: {Identification: check consentResource.Data.Initiation.DebtorAccount.Identification.ensureType(), Name: check consentResource.Data.Initiation.DebtorAccount.Name.ensureType()},
-            CreditorAccount: {Identification: check consentResource.Data.Initiation.CreditorAccount.Identification.ensureType(), Name: check consentResource.Data.Initiation.CreditorAccount.Name.ensureType()},
-            InstructedAmount: {Amount: check consentResource.Data.Initiation.InstructedAmount.Amount.ensureType(), Currency: check consentResource.Data.Initiation.InstructedAmount.Currency.ensureType()}
+        consentId: uuid:createType1AsString(),
+        status: "AwaitingAuthorisation",
+        statusUpdateDateTime: time:utcToString(time:utcNow()),
+        creationDateTime: time:utcToString(time:utcNow()),
+        permission: check consentResource.Data.Permission.ensureType(),
+        initiation: {
+            reference: check consentResource.Data.Initiation.Reference.ensureType(),
+            firstPaymentDateTime: check consentResource.Data.Initiation.FirstPaymentDateTime.ensureType(),
+            finalPaymentDateTime: check consentResource.Data.Initiation.FinalPaymentDateTime.ensureType(),
+            debtorAccount: {identification: check consentResource.Data.Initiation.DebtorAccount.Identification.ensureType(), name: check consentResource.Data.Initiation.DebtorAccount.Name.ensureType()},
+            creditorAccount: {identification: check consentResource.Data.Initiation.CreditorAccount.Identification.ensureType(), name: check consentResource.Data.Initiation.CreditorAccount.Name.ensureType()},
+            instructedAmount: {amount: check consentResource.Data.Initiation.InstructedAmount.Amount.ensureType(), currency: check consentResource.Data.Initiation.InstructedAmount.Currency.ensureType()}
         }
     };
 }
