@@ -26,7 +26,7 @@ service /aopen\-banking/v1\.0/aisp on new http:Listener(9090) {
                 clientSecret: consentServiceClientSecret
             }
         });
-        io:println("Payment Consent Service to generate consent invoked");
+        io:println("Payment Consent Service to generate consent invoked.");
         return check consentService ->/paymentConsents.post(consentResource);
     }
 
@@ -40,7 +40,7 @@ service /aopen\-banking/v1\.0/aisp on new http:Listener(9090) {
                 clientSecret: fundingBankClientSecret
             }
         });
-        io:println("Payment Consent Service to retrieve consent invoked");
+        io:println("Payment Consent Service to retrieve consent invoked.");
         return check consentService ->/paymentConsents(consentId);
     }
 
@@ -48,7 +48,7 @@ service /aopen\-banking/v1\.0/aisp on new http:Listener(9090) {
     # + return - account information.
     resource function post payments(@http:Payload json paymentResource) returns json|error {
         
-        io:println("Accounts endpoint invoked");
+        io:println("Accounts endpoint invoked.");
         fundingbankbackend:Client fundingbankbackendEp = check new (config = {
             auth: {
                 clientId: fundingBankClientId,
