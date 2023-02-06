@@ -52,7 +52,7 @@ service /aopen\-banking/v1\.0/aisp on new http:Listener(9090) {
                 clientSecret: fundingBankClientSecret
             }
         });
-        return check fundingbankbackendEp ->/acounts();
+        return check fundingbankbackendEp ->/accounts;
     }
 
     # Resource to return transactions.
