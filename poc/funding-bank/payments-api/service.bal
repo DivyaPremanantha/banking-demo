@@ -36,8 +36,8 @@ service /aopen\-banking/v1\.0/aisp on new http:Listener(9090) {
     resource function get payment\-access\-consents(string consentId) returns json|error {
         fundingbankconsentmanagement:Client consentService = check new (config = {
             auth: {
-                clientId: fundingBankClientId,
-                clientSecret: fundingBankClientSecret
+                clientId: consentServiceClientId,
+                clientSecret: consentServiceClientSecret
             }
         });
         io:println("Payment Consent Service to retrieve consent invoked.");
