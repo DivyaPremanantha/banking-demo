@@ -174,9 +174,7 @@ service / on new http:Listener(9090) {
     }
 
     # A resource for clearing the consent records.
-    #
-    # + return - payment information.
-    resource function get clearConsentRecords() {
+    resource function delete clearConsentRecords() {
         accountConsents.removeAll();
         paymentConsents.removeAll();
     }
