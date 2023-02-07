@@ -307,6 +307,18 @@ modules = [
 ]
 
 [[package]]
+org = "cgnzntpoc"
+name = "fundingbankconsentmanagement"
+version = "1.0.0"
+dependencies = [
+	{org = "ballerina", name = "http"},
+	{org = "ballerina", name = "url"}
+]
+modules = [
+	{org = "cgnzntpoc", packageName = "fundingbankconsentmanagement", moduleName = "fundingbankconsentmanagement"}
+]
+
+[[package]]
 org = "divya"
 name = "authorization_api"
 version = "0.1.0"
@@ -315,7 +327,8 @@ dependencies = [
 	{org = "ballerina", name = "io"},
 	{org = "ballerina", name = "regex"},
 	{org = "ballerina", name = "test"},
-	{org = "ballerinai", name = "observe"}
+	{org = "ballerinai", name = "observe"},
+	{org = "cgnzntpoc", name = "fundingbankconsentmanagement"}
 ]
 modules = [
 	{org = "divya", packageName = "authorization_api", moduleName = "authorization_api"}
