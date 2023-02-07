@@ -108,7 +108,7 @@ service / on new http:Listener(9090) {
                 return {"Message": "Failure in adding the account conent"};
             }
         } else {
-            io:println("Error in constructing the Account Consent Response");
+            io:println("Error in constructing the Account Consent Response.");
             return accountConsent;
         }
     }
