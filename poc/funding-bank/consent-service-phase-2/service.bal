@@ -94,9 +94,13 @@ service / on new http:Listener(9090) {
             expirationDateTime: check consentResource.Data.ExpirationDateTime,
             permissions: check consentResource.Data.Permissions.ensureType()
         };
+        io:println("Phase-2");
+        io:println(accountConsent);
 
         if !(accountConsent is error) {
             accountConsents.add(accountConsent);
+            io:println("Phase-3");
+            io:println(accountConsents);
             sql:ParameterizedQuery consentQuery = `INSERT INTO accountConsents (consent_id, consent_resource) VALUES (${consentID}, ${accountConsent})`;
             sql:ExecutionResult result = check mysql->execute(consentQuery);
             log:printInfo("Add account consent");
