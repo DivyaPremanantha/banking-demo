@@ -51,9 +51,9 @@ service / on new http:Listener(9090) {
             isValidConsentID = check consentService ->/validateConsents(consentID, "accounts");
         }
 
-        if !(isValidConsentID) {
-            return "https://accounts.asgardeo.io/t/fundingbank/authenticationendpoint/oauth2_error.do?oauthErrorCode=invalid_consentID&oauthErrorMsg=Invalid+consentID";
-        }
+        // if !(isValidConsentID) {
+        //     return "https://accounts.asgardeo.io/t/fundingbank/authenticationendpoint/oauth2_error.do?oauthErrorCode=invalid_consentID&oauthErrorMsg=Invalid+consentID";
+        // }
 
         io:println("Redirecting to the authorization endpoint");
 
