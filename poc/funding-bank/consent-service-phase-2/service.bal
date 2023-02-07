@@ -105,7 +105,7 @@ service / on new http:Listener(9090) {
             if (result.affectedRowCount == 1) {
                 return accountConsent.toJson();
             } else {
-                return {"Message": "Failure in adding the account conent"};
+                return {"Message": "Failure in adding the account conent."};
             }
         } else {
             io:println("Error in constructing the Account Consent Response.");
