@@ -9,11 +9,11 @@ import ballerina/log;
 
 # A service representing a network-accessible API
 # bound to port `9090`.
-string dbHost = "mysql-db-cgnzntpoc.mysql.database.azure.com";
-string dbUser = "divya";
-string dbPassword = "WtkMy#45%jsdUldt#";
-string dbName = "cgnzntpoc";
-int dbPort = 3306;
+configurable string dbHost = ?;
+configurable string dbUser = ?;
+configurable string dbPassword = ?;
+configurable string dbName = ?;
+configurable int dbPort = ?;
 
 table<PaymentConsent> key(consentId) paymentConsents = table [
 
