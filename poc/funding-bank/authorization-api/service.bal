@@ -15,7 +15,7 @@ service / on new http:Listener(9090) {
 
     resource function get authorize(string redirect_uri, string scope, string consentID) returns string|error {
         if consentID is "" {
-            io:println("ConsentID is not sent in request");
+            io:println("ConsentID is not sent in request.");
             return "https://accounts.asgardeo.io/t/fundingbank/authenticationendpoint/oauth2_error.do?oauthErrorCode=invalid_request&oauthErrorMsg=Empty+ConsentID";
         }
         if accountsAppClientId is "" || paymentsAppClientId is "" {
