@@ -181,7 +181,7 @@ service / on new http:Listener(9090) {
         sql:ParameterizedQuery deletePaymentQuery = `DELETE FROM paymentconsents`;
         sql:ExecutionResult deletePayResult = check mysql->execute(deletePaymentQuery);
 
-        if (deleteAccResult.affectedRowCount == 1 && deletePayResult.affectedRowCount == 1) {
+        if (deleteAccResult.affectedRowCount > 1 && deletePayResult.affectedRowCount > 1) {
             return {"Message": "Recordes successfully deleted"};
         } else {
             return error("Error deleting the records");
