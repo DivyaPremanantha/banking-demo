@@ -118,14 +118,16 @@ service / on new http:Listener(9090) {
     # + consentID - the consent ID.
     # + return - account information.
     resource function get accountConsents(string consentID) returns json|error {
-
+        io:print("Log - 1");
         sql:ParameterizedQuery consentQuery = `SELECT consent_resource FROM accountConsents WHERE consent_id = ${consentID};`;
         stream<AccountConsent, sql:Error?> consentStream = mysql->query(consentQuery);
         AccountConsent accConsnent;
-io:print("Log");
-        io:print(consentStream.toString());
+        io:print("Log - 2");
+        io:print(consentStream);
         check from AccountConsent accountConsent in consentStream
             do {
+                io:print("Log - 3");
+                io:print(accountConsent);
                 accConsnent = accountConsent;
             };
 
