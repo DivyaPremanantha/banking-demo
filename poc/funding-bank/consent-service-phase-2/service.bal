@@ -56,6 +56,9 @@ type InstructedAmountRecord record {|
 table<AccountConsent> accountConsents = table [
 
 ];
+type AccountConsent1 record {
+    json consent_recource;
+};
 
 type AccountConsent record {|
     string consentId;
@@ -120,11 +123,11 @@ service / on new http:Listener(9090) {
     resource function get accountConsents(string consentID) returns json|error {
         io:println("Log - 1");
         sql:ParameterizedQuery consentQuery = `SELECT consent_resource FROM accountConsents WHERE consent_id = ${consentID};`;
-        stream<AccountConsent, sql:Error?> consentStream = mysql->query(consentQuery);
+        stream<AccountConsent1, sql:Error?> consentStream = mysql->query(consentQuery);
         AccountConsent accConsnent;
         io:println("Log - 2");
         io:println(consentStream);
-        check from AccountConsent accountConsent in consentStream
+        check from AccountConsent1 accountConsent in consentStream
             do {
                 io:println("Log - 3");
                 io:println(accountConsent);
