@@ -57,7 +57,7 @@ table<AccountConsent> accountConsents = table [
 
 ];
 type AccountConsents record {
-    AccountConsent accountConsent;
+    json consentResource;
 };
 
 type AccountConsent record {|
@@ -100,7 +100,7 @@ service / on new http:Listener(9090) {
 
         if !(accountConsent is error) {
             accountConsents.add(accountConsent);
-            sql:ParameterizedQuery consentQuery = `INSERT INTO accountConsents (consent_id, accountConsent) VALUES (${consentID}, ${accountConsent.toString()})`;
+            sql:ParameterizedQuery consentQuery = `INSERT INTO accountConsents (consent_id, consentResource) VALUES (${consentID}, ${accountConsent.toString()})`;
             sql:ExecutionResult result = check mysql->execute(consentQuery);
             log:printInfo("Add account consent");
             io:println("Account Consent Created");
@@ -122,16 +122,16 @@ service / on new http:Listener(9090) {
     # + return - account information.
     resource function get accountConsents(string consentID) returns json|error {
         io:println("Log - 1");
-        sql:ParameterizedQuery consentQuery = `SELECT accountConsent FROM accountConsents WHERE consent_id = ${consentID};`;
+        sql:ParameterizedQuery consentQuery = `SELECT consentResource FROM accountConsents WHERE consent_id = ${consentID};`;
         stream<AccountConsents, sql:Error?> consentStream = mysql->query(consentQuery);
-        AccountConsent accConsnent;
+        json accConsnent;
         io:println("Log - 2");
         io:println(consentStream);
         check from AccountConsents accountConsent in consentStream
             do {
                 io:println("Log - 3");
                 io:println(accountConsent);
-                accConsnent = accountConsent.accountConsent;
+                accConsnent = accountConsent.consentResource;
             };
 
         io:println("Account Consent Response Retrieved");
