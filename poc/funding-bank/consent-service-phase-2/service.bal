@@ -56,8 +56,8 @@ type InstructedAmountRecord record {|
 table<AccountConsent> accountConsents = table [
 
 ];
-type AccountConsent1 record {
-    json consent_recource;
+type AccountConsents record {
+    AccountConsent accountConsent;
 };
 
 type AccountConsent record {|
@@ -100,7 +100,7 @@ service / on new http:Listener(9090) {
 
         if !(accountConsent is error) {
             accountConsents.add(accountConsent);
-            sql:ParameterizedQuery consentQuery = `INSERT INTO accountConsents (consent_id, consent_resource) VALUES (${consentID}, ${accountConsent.toString()})`;
+            sql:ParameterizedQuery consentQuery = `INSERT INTO accountConsents (consent_id, accountConsent) VALUES (${consentID}, ${accountConsent.toString()})`;
             sql:ExecutionResult result = check mysql->execute(consentQuery);
             log:printInfo("Add account consent");
             io:println("Account Consent Created");
@@ -123,19 +123,19 @@ service / on new http:Listener(9090) {
     resource function get accountConsents(string consentID) returns json|error {
         io:println("Log - 1");
         sql:ParameterizedQuery consentQuery = `SELECT consent_resource FROM accountConsents WHERE consent_id = ${consentID};`;
-        stream<AccountConsent1, sql:Error?> consentStream = mysql->query(consentQuery);
+        stream<AccountConsents, sql:Error?> consentStream = mysql->query(consentQuery);
         AccountConsent accConsnent;
         io:println("Log - 2");
         io:println(consentStream);
-        check from AccountConsent1 accountConsent in consentStream
+        check from AccountConsents accountConsent in consentStream
             do {
                 io:println("Log - 3");
                 io:println(accountConsent);
-                // accConsnent = accountConsent;
+                accConsnent = accountConsent.accountConsent;
             };
 
         io:println("Account Consent Response Retrieved");
-        // return accConsnent.toJson();
+        return accConsnent;
     }
 
     # A resource for generating payment consent.
