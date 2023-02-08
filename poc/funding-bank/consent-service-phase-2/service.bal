@@ -175,10 +175,10 @@ service / on new http:Listener(9090) {
     # 
     # + return - consent delete information.
     resource function delete consentRecords() returns json|error {
-        sql:ParameterizedQuery deleteAccountQuery = `DELETE FROM accountConsents`;
+        sql:ParameterizedQuery deleteAccountQuery = `DELETE FROM accountconsents`;
         sql:ExecutionResult deleteAccResult = check mysql->execute(deleteAccountQuery);
 
-        sql:ParameterizedQuery deletePaymentQuery = `DELETE FROM paymentConsents`;
+        sql:ParameterizedQuery deletePaymentQuery = `DELETE FROM paymentconsents`;
         sql:ExecutionResult deletePayResult = check mysql->execute(deletePaymentQuery);
 
         if (deleteAccResult.affectedRowCount == 1 && deletePayResult.affectedRowCount == 1) {
