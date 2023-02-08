@@ -131,11 +131,11 @@ service / on new http:Listener(9090) {
             do {
                 io:println("Log - 3");
                 io:println(accountConsent);
-                accConsnent = accountConsent;
+                // accConsnent = accountConsent;
             };
 
         io:println("Account Consent Response Retrieved");
-        return accConsnent.toJson();
+        // return accConsnent.toJson();
     }
 
     # A resource for generating payment consent.
