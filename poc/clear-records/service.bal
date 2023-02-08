@@ -43,9 +43,9 @@ service / on new http:Listener(9090) {
         http:Response|error cognizantResponse = check cognizantBackend ->/records.delete();
 
         if !(consentResponse is error || fundingBankResponse is error || cognizantResponse is error) {
-            return {"Message": "Records successfully deleted"};
+            return {"Message": "Records successfully deleted."};
         } else {
-            return {"Message": "Error in deleting the records"};
+            return {"Message": "Error in deleting the records."};
         }
     }
 }
