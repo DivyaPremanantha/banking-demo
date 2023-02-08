@@ -122,8 +122,8 @@ service / on new http:Listener(9090) {
         sql:ParameterizedQuery consentQuery = `SELECT consent_resource FROM accountConsents WHERE consent_id = ${consentID};`;
         stream<AccountConsent, sql:Error?> consentStream = mysql->query(consentQuery);
         AccountConsent accConsnent;
-
-        io:print(consentStream);
+io:print("Log");
+        io:print(consentStream.toString());
         check from AccountConsent accountConsent in consentStream
             do {
                 accConsnent = accountConsent;
