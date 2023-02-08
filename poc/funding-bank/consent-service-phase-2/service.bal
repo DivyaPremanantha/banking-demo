@@ -130,7 +130,7 @@ service / on new http:Listener(9090) {
         check from AccountConsent1 accountConsent in consentStream
             do {
                 io:println("Log - 3");
-                io:println(accountConsent);
+                io:println(accountConsent.toJsonString());
                 // accConsnent = accountConsent;
             };
 
