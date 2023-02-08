@@ -2,14 +2,22 @@ import ballerina/http;
 import ballerina/time;
 import ballerina/io;
 import ballerina/uuid;
-import ballerina/regex;
+import ballerinax/mysql;
+import ballerinax/mysql.driver as _;
+import ballerina/sql;
+import ballerina/log;
 
 # A service representing a network-accessible API
 # bound to port `9090`.
+configurable string dbHost = ?;
+configurable string dbUser = ?;
+configurable string dbPassword = ?;
+configurable string dbName = ?;
+configurable int dbPort = ?;
 
-table<PaymentConsent> key(consentId) paymentConsents = table [
-
-];
+type PaymentConsents record {
+    json consentResource;
+};
 
 type PaymentConsent record {|
     readonly string consentId;
@@ -45,12 +53,12 @@ type InstructedAmountRecord record {|
     string currency;
 |};
 
-table<AccountConsent> key(consentId) accountConsents = table [
-
-];
+type AccountConsents record {
+    json consentResource;
+};
 
 type AccountConsent record {|
-    readonly string consentId;
+    string consentId;
     string status;
     string statusUpdateDateTime;
     string creationDateTime;
@@ -59,6 +67,10 @@ type AccountConsent record {|
     string expirationDateTime;
     json[] permissions;
 |};
+
+mysql:Client mysql = check new (
+    dbHost, dbUser, dbPassword, dbName, dbPort
+);
 
 service / on new http:Listener(9090) {
 
@@ -69,8 +81,10 @@ service / on new http:Listener(9090) {
     resource function post accountConsents(@http:Payload json consentResource) returns json|error {
         io:println("Constructing Account Consent Response");
 
+        string consentID = uuid:createType1AsString();
+
         AccountConsent|error accountConsent = {
-            consentId: uuid:createType1AsString(),
+            consentId: consentID,
             status: "AwaitingAuthorisation",
             statusUpdateDateTime: time:utcToString(time:utcNow()),
             creationDateTime: time:utcToString(time:utcNow()),
@@ -81,11 +95,18 @@ service / on new http:Listener(9090) {
         };
 
         if !(accountConsent is error) {
-            accountConsents.add(accountConsent);
-            io:println("Account Consent Response Constructed");
-            return accountConsent.toJson();
+            sql:ParameterizedQuery consentQuery = `INSERT INTO accountConsents (consentId, consentResource) VALUES (${consentID}, ${accountConsent.toString()})`;
+            sql:ExecutionResult result = check mysql->execute(consentQuery);
+            log:printInfo("Add account consent");
+            io:println("Account Consent Created");
+
+            if (result.affectedRowCount == 1) {
+                return accountConsent.toJson();
+            } else {
+                return {"Message": "Failure in adding the account conent."};
+            }
         } else {
-            io:println("Error in constructing the Account Consent Response");
+            io:println("Error in constructing the Account Consent Response.");
             return accountConsent;
         }
     }
@@ -95,16 +116,17 @@ service / on new http:Listener(9090) {
     # + consentID - the consent ID.
     # + return - account information.
     resource function get accountConsents(string consentID) returns json|error {
-        AccountConsent[] accountConsent = from var consent in accountConsents
-            where consent.consentId == consentID
-            select consent;
+        io:println("Log - 1");
+        sql:ParameterizedQuery consentQuery = `SELECT consentResource FROM accountConsents WHERE consentId = ${consentID};`;
+        stream<AccountConsents, sql:Error?> consentStream = mysql->query(consentQuery);
+        json accConsnent;
+        check from AccountConsents accountConsent in consentStream
+            do {
+                accConsnent = accountConsent.consentResource;
+            };
 
         io:println("Account Consent Response Retrieved");
-        if (accountConsent.length() > 0) {
-            return accountConsent[0].toJson();
-        } else {
-            return {};
-        }
+        return accConsnent;
     }
 
     # A resource for generating payment consent.
@@ -112,14 +134,20 @@ service / on new http:Listener(9090) {
     # + consentResource - the consent resource.
     # + return - payment information.
     resource function post paymentConsents(@http:Payload json consentResource) returns json|error {
-        io:println("Constructing Payment Consent Response");
-
-        PaymentConsent|error paymentConsent = generatePaymentConsent(consentResource);
+        string consentID = uuid:createType1AsString();
+        PaymentConsent|error paymentConsent = generatePaymentConsent(consentID, consentResource);
 
         if !(paymentConsent is error) {
-            io:println("Payment Consent Response Constructed");
-            paymentConsents.add(paymentConsent);
-            return paymentConsent.toJson();
+            sql:ParameterizedQuery consentQuery = `INSERT INTO paymentConsents (consentId, consentResource) VALUES (${consentID}, ${paymentConsent.toString()})`;
+            sql:ExecutionResult result = check mysql->execute(consentQuery);
+            log:printInfo("Add payment consent");
+            io:println("Payment Consent Created");
+
+            if (result.affectedRowCount == 1) {
+                return paymentConsent.toJson();
+            } else {
+                return {"Message": "Failure in adding the payment conent"};
+            }
         } else {
             io:println("Error in constructing the Payment Consent Response");
             return paymentConsent;
@@ -131,58 +159,39 @@ service / on new http:Listener(9090) {
     # + consentID - the consent ID.
     # + return - payment information.
     resource function get paymentConsents(string consentID) returns json|error {
-        PaymentConsent[] paymentConsent = from var consent in paymentConsents
-            where consent.consentId == consentID
-            select consent;
+        sql:ParameterizedQuery consentQuery = `SELECT consentResource FROM paymentConsents WHERE consentId = ${consentID};`;
+        stream<PaymentConsents, sql:Error?> consentStream = mysql->query(consentQuery);
+        json payConsnent;
+        check from PaymentConsents paymentConsent in consentStream
+            do {
+                payConsnent = paymentConsent.consentResource;
+            };
 
-        io:println("Account Consent Response Retrieved");
-        if (paymentConsent.length() > 0) {
-            return paymentConsent[0].toJson();
-        } else {
-            return {};
-        }
-    }
-    
-    # Validate consentID.
-    #
-    # + consentID - the consent ID.
-    # + return - payment information.
-    resource function get validateConsents(string consentID, string scope) returns boolean|error {
-        if (regex:matches(scope, "^.*payments.*$")) {
-            PaymentConsent[] paymentConsent = from var consent in paymentConsents
-                where consent.consentId == consentID
-                select consent;
-
-            io:println("Payment Consent Response Retrieved");
-            if (paymentConsent.length() > 0) {
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            AccountConsent[] accountConsent = from var accConsent in accountConsents
-                where accConsent.consentId == consentID
-                select accConsent;
-
-            io:println("Account Consent Response Retrieved");
-            if (accountConsent.length() > 0) {
-                return true;
-            } else {
-                return false;
-            }
-        }
+        io:println("Payment Consent Response Retrieved");
+        return payConsnent;
     }
 
     # A resource for clearing the consent records.
-    resource function delete consentRecords() {
-        accountConsents.removeAll();
-        paymentConsents.removeAll();
+    # 
+    # + return - consent delete information.
+    resource function delete consentRecords() returns json|error {
+        sql:ParameterizedQuery deleteAccountQuery = `DELETE FROM accountconsents`;
+        sql:ExecutionResult deleteAccResult = check mysql->execute(deleteAccountQuery);
+
+        sql:ParameterizedQuery deletePaymentQuery = `DELETE FROM paymentconsents`;
+        sql:ExecutionResult deletePayResult = check mysql->execute(deletePaymentQuery);
+
+        if (deleteAccResult.affectedRowCount >= 0 && deletePayResult.affectedRowCount >= 0) {
+            return {"Message": "Recordes successfully deleted"};
+        } else {
+            return error("Error deleting the records");
+        }
     }
 }
 
-function generatePaymentConsent(json consentResource) returns PaymentConsent|error {
+function generatePaymentConsent(string consentId, json consentResource) returns PaymentConsent|error {
     return {
-        consentId: uuid:createType1AsString(),
+        consentId: consentId,
         status: "AwaitingAuthorisation",
         statusUpdateDateTime: time:utcToString(time:utcNow()),
         creationDateTime: time:utcToString(time:utcNow()),
@@ -197,4 +206,3 @@ function generatePaymentConsent(json consentResource) returns PaymentConsent|err
         }
     };
 }
-
