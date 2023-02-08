@@ -10,7 +10,7 @@ configurable string accountsAppClientId = ?;
 configurable string paymentsAppClientId = ?;
 configurable string consentServiceClientId = ?;
 configurable string consentServiceClientSecret = ?;
-boolean isValidConsentID = false;
+json|error consent;
 service / on new http:Listener(9090) {
 
     resource function get authorize(string redirect_uri, string scope, string consentID) returns string|error {
@@ -44,16 +44,14 @@ service / on new http:Listener(9090) {
         string encodedScope = regex:replace(scope, " ", "%20");
 
         if regex:matches(scope, "^.*payments.*$") {
-            isValidConsentID = check consentService ->/validateConsents(consentID, "payments");
-            io:println(scope);
-            io:println(isValidConsentID);
+            consent = check consentService ->/paymentConsents(consentID);
         } else {
-            isValidConsentID = check consentService ->/validateConsents(consentID, "accounts");
+            consent = check consentService ->/accountConsents(consentID);
         }
 
-        // if !(isValidConsentID) {
-        //     return "https://accounts.asgardeo.io/t/fundingbank/authenticationendpoint/oauth2_error.do?oauthErrorCode=invalid_consentID&oauthErrorMsg=Invalid+consentID";
-        // }
+        if (consent == null) {
+             return "https://accounts.asgardeo.io/t/fundingbank/authenticationendpoint/oauth2_error.do?oauthErrorCode=invalid_consentID&oauthErrorMsg=Invalid+consentID";
+        }
 
         io:println("Redirecting to the authorization endpoint.");
 
