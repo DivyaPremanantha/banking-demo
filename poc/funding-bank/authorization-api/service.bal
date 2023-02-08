@@ -10,7 +10,7 @@ configurable string accountsAppClientId = ?;
 configurable string paymentsAppClientId = ?;
 configurable string consentServiceClientId = ?;
 configurable string consentServiceClientSecret = ?;
-json|error consent;
+json|error consent = null;
 service / on new http:Listener(9090) {
 
     resource function get authorize(string redirect_uri, string scope, string consentID) returns string|error {
