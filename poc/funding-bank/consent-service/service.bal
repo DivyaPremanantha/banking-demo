@@ -101,7 +101,7 @@ service / on new http:Listener(9090) {
 
         io:println("Account Consent Response Retrieved");
         if (accountConsent.length() > 0) {
-            return accountConsent[0].toString().toJson();
+            return accountConsent[0].toJson();
         } else {
             return {};
         }
@@ -137,7 +137,7 @@ service / on new http:Listener(9090) {
 
         io:println("Account Consent Response Retrieved");
         if (paymentConsent.length() > 0) {
-            return paymentConsent[0].toString().toJson();
+            return paymentConsent[0].toJson();
         } else {
             return {};
         }
