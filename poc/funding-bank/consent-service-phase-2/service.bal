@@ -178,7 +178,7 @@ service / on new http:Listener(9090) {
         sql:ParameterizedQuery deleteAccountQuery = `DELETE FROM accountConsents`;
         sql:ExecutionResult deleteAccResult = check mysql->execute(deleteAccountQuery);
 
-        sql:ParameterizedQuery deletePaymentQuery = `DELETE FROM paymentconsents`;
+        sql:ParameterizedQuery deletePaymentQuery = `DELETE FROM paymentConsents`;
         sql:ExecutionResult deletePayResult = check mysql->execute(deletePaymentQuery);
 
         if (deleteAccResult.affectedRowCount == 1 && deletePayResult.affectedRowCount == 1) {
