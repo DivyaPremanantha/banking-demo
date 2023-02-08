@@ -123,7 +123,7 @@ service / on new http:Listener(9090) {
         stream<AccountConsent, sql:Error?> consentStream = mysql->query(consentQuery);
         AccountConsent accConsnent;
 
-        io:print(consentStream)
+        io:print(consentStream);
         check from AccountConsent accountConsent in consentStream
             do {
                 accConsnent = accountConsent;
