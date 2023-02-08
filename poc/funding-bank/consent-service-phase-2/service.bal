@@ -53,12 +53,12 @@ type InstructedAmountRecord record {|
     string currency;
 |};
 
-table<AccountConsent> key(consentId) accountConsents = table [
+table<AccountConsent> accountConsents = table [
 
 ];
 
 type AccountConsent record {|
-    readonly string consentId;
+    string consentId;
     string status;
     string statusUpdateDateTime;
     string creationDateTime;
