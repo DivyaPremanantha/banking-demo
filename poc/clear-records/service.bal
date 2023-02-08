@@ -1,7 +1,7 @@
 import ballerina/http;
 import cgnzntpoc/fundingbankconsentmanagement;
 import cgnzntpoc/fundingbankbackend;
-import cgnzntpoc/cognizantcorebankbackend;
+import cgnzntpoc/cognizantcorebankbackend_no;
 
 configurable string consentServiceClientId = ?;
 configurable string consentServiceClientSecret = ?;
@@ -14,9 +14,9 @@ configurable string cognizantBankClientSecret = ?;
 # bound to port `9090`.
 service / on new http:Listener(9090) {
 
-    # A resource for generating greetings
-
-    resource function delete greeting() returns http:Response|error{
+    # A resource for deleting the records
+    # + return - The response of the record deletion invocation
+    resource function delete records() returns json|error{
         fundingbankconsentmanagement:Client consentService = check new (config = {
             auth: {
                 clientId: consentServiceClientId,
@@ -24,7 +24,7 @@ service / on new http:Listener(9090) {
             }
         });
 
-        cognizantcorebankbackend:Client cognizantBackend = check new (config = {
+        cognizantcorebankbackend_no:Client cognizantBackend = check new (config = {
             auth: {
                 clientId: cognizantBankClientId,
                 clientSecret: cognizantBankClientSecret
@@ -38,16 +38,14 @@ service / on new http:Listener(9090) {
             }
         });
 
-        http:Response|error consentResponse = consentService ->/consentRecords.delete();
-        http:Response|error fundingBankResponse = fundingBackend ->/records.delete();
-        http:Response|error cognizantResponse = cognizantBackend ->/r
+        http:Response|error consentResponse = check consentService ->/consentRecords.delete();
+        http:Response|error fundingBankResponse = check fundingBackend ->/records.delete();
+        http:Response|error cognizantResponse = check cognizantBackend ->/records.delete();
 
-        if (consentResponse is error) {
-            return consentResponse;
-        } else if (fundingBackend is error) {
-            return fundingBackend;
-        } else if (cognizantBackend is error) {
-            return consentResponse;
+        if !(consentResponse is error || fundingBankResponse is error || cognizantResponse is error) {
+            return {"Message": "Records successfully deleted"};
+        } else {
+            return {"Message": "Error in deleting the records"};
         }
     }
 }
