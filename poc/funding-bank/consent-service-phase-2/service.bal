@@ -15,9 +15,9 @@ configurable string dbPassword = ?;
 configurable string dbName = ?;
 configurable int dbPort = ?;
 
-table<PaymentConsent> key(consentId) paymentConsents = table [
-
-];
+type PaymentConsents record {
+    json consentResource;
+};
 
 type PaymentConsent record {|
     readonly string consentId;
@@ -53,9 +53,6 @@ type InstructedAmountRecord record {|
     string currency;
 |};
 
-table<AccountConsent> accountConsents = table [
-
-];
 type AccountConsents record {
     json consentResource;
 };
@@ -82,7 +79,6 @@ service / on new http:Listener(9090) {
     # + consentResource - the consent resource.
     # + return - account information.
     resource function post accountConsents(@http:Payload json consentResource) returns json|error {
-        accountConsents.removeAll();
         io:println("Constructing Account Consent Response");
 
         string consentID = uuid:createType1AsString();
@@ -99,8 +95,7 @@ service / on new http:Listener(9090) {
         };
 
         if !(accountConsent is error) {
-            accountConsents.add(accountConsent);
-            sql:ParameterizedQuery consentQuery = `INSERT INTO accountConsents (consent_id, consentResource) VALUES (${consentID}, ${accountConsent.toString()})`;
+            sql:ParameterizedQuery consentQuery = `INSERT INTO accountConsents (consentId, consentResource) VALUES (${consentID}, ${accountConsent.toString()})`;
             sql:ExecutionResult result = check mysql->execute(consentQuery);
             log:printInfo("Add account consent");
             io:println("Account Consent Created");
@@ -122,15 +117,11 @@ service / on new http:Listener(9090) {
     # + return - account information.
     resource function get accountConsents(string consentID) returns json|error {
         io:println("Log - 1");
-        sql:ParameterizedQuery consentQuery = `SELECT consentResource FROM accountConsents WHERE consent_id = ${consentID};`;
+        sql:ParameterizedQuery consentQuery = `SELECT consentResource FROM accountConsents WHERE consentId = ${consentID};`;
         stream<AccountConsents, sql:Error?> consentStream = mysql->query(consentQuery);
         json accConsnent;
-        io:println("Log - 2");
-        io:println(consentStream);
         check from AccountConsents accountConsent in consentStream
             do {
-                io:println("Log - 3");
-                io:println(accountConsent);
                 accConsnent = accountConsent.consentResource;
             };
 
@@ -143,14 +134,11 @@ service / on new http:Listener(9090) {
     # + consentResource - the consent resource.
     # + return - payment information.
     resource function post paymentConsents(@http:Payload json consentResource) returns json|error {
-        paymentConsents.removeAll();
         string consentID = uuid:createType1AsString();
         PaymentConsent|error paymentConsent = generatePaymentConsent(consentID, consentResource);
 
         if !(paymentConsent is error) {
-            paymentConsents.add(paymentConsent);
-
-            sql:ParameterizedQuery consentQuery = `INSERT INTO paymentConsents (consent_id, consent_resource) VALUES (${consentID}, ${paymentConsent.toString()})`;
+            sql:ParameterizedQuery consentQuery = `INSERT INTO paymentConsents (consentId, consentResource) VALUES (${consentID}, ${paymentConsent.toString()})`;
             sql:ExecutionResult result = check mysql->execute(consentQuery);
             log:printInfo("Add payment consent");
             io:println("Payment Consent Created");
@@ -171,16 +159,16 @@ service / on new http:Listener(9090) {
     # + consentID - the consent ID.
     # + return - payment information.
     resource function get paymentConsents(string consentID) returns json|error {
-        sql:ParameterizedQuery consentQuery = `SELECT consent_resource FROM paymentConsents WHERE consent_id = ${consentID};`;
-        stream<PaymentConsent, sql:Error?> consentStream = mysql->query(consentQuery);
-        PaymentConsent payConsnent;
-        check from PaymentConsent paymentConsent in consentStream
+        sql:ParameterizedQuery consentQuery = `SELECT consentResource FROM paymentConsents WHERE consentId = ${consentID};`;
+        stream<PaymentConsents, sql:Error?> consentStream = mysql->query(consentQuery);
+        json payConsnent;
+        check from PaymentConsents paymentConsent in consentStream
             do {
-                payConsnent = paymentConsent;
+                payConsnent = paymentConsent.consentResource;
             };
 
         io:println("Payment Consent Response Retrieved");
-        return payConsnent.toJson();
+        return payConsnent;
     }
 
     # A resource for clearing the consent records.
