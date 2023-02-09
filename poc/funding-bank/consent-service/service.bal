@@ -9,11 +9,11 @@ import ballerina/log;
 
 # A service representing a network-accessible API
 # bound to port `9090`.
-configurable string dbHost = ?;
-configurable string dbUser = ?;
-configurable string dbPassword = ?;
-configurable string dbName = ?;
-configurable int dbPort = ?;
+configurable string dbHost = "mysql-db-cgnzntpoc.mysql.database.azure.com";
+configurable string dbUser = "divya";
+configurable string dbPassword = "WtkMy#45%jsdUldt#";
+configurable string dbName = "cgnzntpoc";
+configurable int dbPort = 3306;
 
 type PaymentConsents record {
     json consentResource;
@@ -69,9 +69,8 @@ type AccountConsent record {|
 |};
 
 mysql:Client mysql = check new (
-    dbHost, dbUser, dbPassword, dbName, dbPort
+    dbHost, dbUser, dbPassword, dbName, dbPort, connectionPool = { maxOpenConnections: 5 }
 );
-
 service / on new http:Listener(9090) {
 
     # A resource for generating account consent.
