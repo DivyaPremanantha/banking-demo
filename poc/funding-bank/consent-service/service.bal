@@ -124,7 +124,7 @@ service / on new http:Listener(9090) {
             do {
                 accConsnent = accountConsent.consentResource;
             };
-
+        check consentStream.close();
         io:println("Account Consent Response Retrieved");
         return accConsnent;
     }
@@ -166,7 +166,7 @@ service / on new http:Listener(9090) {
             do {
                 payConsnent = paymentConsent.consentResource;
             };
-
+        check consentStream.close();
         io:println("Payment Consent Response Retrieved");
         return payConsnent;
     }
