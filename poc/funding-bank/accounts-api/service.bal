@@ -10,7 +10,7 @@ configurable string consentServiceClientSecret = ?;
 configurable string fundingBankClientId = ?;
 configurable string fundingBankClientSecret = ?;
 
-service /aopen\-banking/v1\.0/aisp on new http:Listener(9090) {
+service / on new http:Listener(9090) {
 
     # Resource for generating account consent.
     # + consentResource - the consent resource.
